@@ -17,7 +17,40 @@ This is a service that will be called when a user starts, or stops, any content 
 - A combination of Node.js and Typescript is used to define resources, while GitHub is the version control system of choice
 - CloudWatch will be used as the monitoring and logging tool
 
+##### Enhancement Strat:
+
+1. Include the usage of GraphQL
+    - this will remove the need to filter through objProps
+    - resulting in a leaner approach to passing data
+    - which results in less computation time and throughput 
+
+2. Increased modularity on Lambda fxns
+    - instead of having one lambda do all of the 'lifting', we can separate the fxns to perform a single purpose only
+    - this will increase performance 
+    - this will lead to ease of debugging at scale
+
+3. Elastic Load Balancers
+    - by setting throughput thresholds, we can instantiate new instances vertically and increase capacity horizontally based on events
+
+4. Read/Write Replicas:
+    - we can decouple the different operations on the DB by having read-only replicas and write-only replicas 
+    - relevant lambdas can then perform operations without worrying about throughput load 
+
+5. SAM:
+    - by using SAM we can automate testing on the lamdas
+
+6. CloudWatch:
+    - triggers, events and alerts can be linked up so that notifications relating to system heealth are delivered to admins
+
+#### To Do:
+1. Make ApiGateway pass params to Lambda
+2. Make Lambda expect params
+3. Make Lambda connect to and query DynamoDB
+4. Make Lambda validate the queried info on Table
+5. Make Lambda return response to ApiGateway
+
 ### Here's how the service works:
+
 #### ApiGateway:
 - This will expose the service and serve as an entry point so as to be consumed by any client
 - It will facilitate ANY method: ['GET', 'POST', 'DELETE', 'PUT'] 
@@ -29,6 +62,15 @@ This is a service that will be called when a user starts, or stops, any content 
     - onClick play event will pass e.target.contentTitle (among others)
     - onClick stop event will pass e.target.contentTitle (among others)
 
+##### To Do:
+    - accept params from client
+        - event
+        - user
+    - pass params to lambda 
+    - await response from lambda
+
+##### Enhancement Strat:
+
 #### Lambda:
 - This will hold the 'business' logic and will handle the computations
 - it will consume the user object props and the event (play and stop) props
@@ -38,8 +80,20 @@ This is a service that will be called when a user starts, or stops, any content 
 - if the user is allowed, lambda will then append the e.target.contentTitle to the contentTitles array and return the bool 'true' to ApiGateway, and lastly will increment the activeStreamCount by 1.
 - if the user is denied, lambda will return false to ApiGateway
 
+##### To Do:
+    - expect params (event, user) from apigateway
+    - connect to dynamoDB and query the table based on the params passed 
+    - evaluate the info in the table 
+    - return an outcome response to apigateway
+
+##### Enhancement Strat:
+
 #### Cloud watch:
 - This is used to monitor the health of the Lambda via the AWS management console dashboard
+
+##### To Do:
+
+##### Enhancement Strat:
 
 #### DynamoDB:
 - This will hold the tables containing users and user info. 
@@ -48,20 +102,15 @@ This is a service that will be called when a user starts, or stops, any content 
     - accName (STRING) ==> SORTING_KEY
     - activeStreamCount (NUMBER)
     - contentTitles (ARRAY)
+- a DynamoDB Stream will be linked to the Lambda
+
+##### To Do:
+
+##### Enhancement Strat:
 
 #### Deployment Instructions:
 1. Ensure that you are in the root directory of the project
 2. Run the following command: 'cdk bootstrap --profile user1'.
 3. Once completed, run the following command: 'cdk deploy --profile user1'
-    
-## Useful commands
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
 

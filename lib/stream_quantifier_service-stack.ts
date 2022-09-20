@@ -27,8 +27,8 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
       },
       // replicationRegions: ['us-east-2', 'us-west-2'],
       // removalPolicy: RemovalPolicy.DESTROY,
-      // readCapacity: 20,
-      // writeCapacity: 20,
+      // readCapacity: 2,
+      // writeCapacity: 2,
       // tableClass: dynamoDB.TableClass.STANDARD_INFREQUENT_ACCESS,
       // billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
     })
@@ -40,6 +40,7 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
       // either allow or deny user request
       // increment activeStreamCount by 1 on success
       // append event.contentTitle to contentTitles array
+
     const LambdaOne = new lambda.Function(this, 'LambdaOne',{
       code: new lambda.AssetCode('resources'),
       handler: 'Lambdas.LambdaOneHandler',
@@ -56,7 +57,7 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
     // apigateway starts here
 
     // this API will expect two objects: (event, user)
-    // this API will accept any method
+    // this API will allow any method
     // it will pass the event, and user to lambda 
 
   const myApiGateway = new ApiGateway.LambdaRestApi(this, '/', {
