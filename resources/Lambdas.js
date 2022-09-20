@@ -18,8 +18,14 @@ export function LambdaOneHandler(e, user){
     const eventBody = typeof e.body == 'object' ? e.body: JSON.parse(e.body);
     const userBody = typeof user.body == 'object' ? user.body: JSON.parse(user.body)
 
+    const params = {
+        TableName: TABLE_NAME,
+        PrimaryKey: PRIMARY_KEY,
+
+    }
+
     // DB connection/reading happens here
-    checkingDb = (userBody, eventBody) => {
+    let checkingDb = (userBody, eventBody) => {
         if(eventBody == 'object' && userBody == 'object'){
 
             await.db.any(userBody, eventBody).promise();

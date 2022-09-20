@@ -38,6 +38,9 @@ This is a service that will be called when a user starts, or stops, any content 
 - if the user is allowed, lambda will then append the e.target.contentTitle to the contentTitles array and return the bool 'true' to ApiGateway, and lastly will increment the activeStreamCount by 1.
 - if the user is denied, lambda will return false to ApiGateway
 
+#### Cloud watch:
+- This is used to monitor the health of the Lambda via the AWS management console dashboard
+
 #### DynamoDB:
 - This will hold the tables containing users and user info. 
 - Such as:
@@ -45,6 +48,11 @@ This is a service that will be called when a user starts, or stops, any content 
     - accName (STRING) ==> SORTING_KEY
     - activeStreamCount (NUMBER)
     - contentTitles (ARRAY)
+
+#### Deployment Instructions:
+1. Ensure that you are in the root directory of the project
+2. Run the following command: 'cdk bootstrap --profile user1'.
+3. Once completed, run the following command: 'cdk deploy --profile user1'
     
 ## Useful commands
 

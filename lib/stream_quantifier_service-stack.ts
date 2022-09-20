@@ -2,7 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import * as dynamoDB from '@aws-cdk/aws-dynamodb';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ApiGateway from '@aws-cdk/aws-apigateway';
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { RemovalPolicy } from '@aws-cdk/core';
 
 export class StreamQuantifierServiceStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -25,12 +25,12 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
         name: 'accName',
         type: dynamoDB.AttributeType.STRING
       },
-      replicationRegions: ['us-east-2', 'us-west-2'],
-      removalPolicy: RemovalPolicy.DESTROY,
-      readCapacity: 20,
-      writeCapacity: 20,
-      tableClass: dynamoDB.TableClass.STANDARD_INFREQUENT_ACCESS,
-      billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
+      // replicationRegions: ['us-east-2', 'us-west-2'],
+      // removalPolicy: RemovalPolicy.DESTROY,
+      // readCapacity: 20,
+      // writeCapacity: 20,
+      // tableClass: dynamoDB.TableClass.STANDARD_INFREQUENT_ACCESS,
+      // billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
     })
 
     // lambda start here
@@ -63,7 +63,7 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
       description: 'The api layer that exposes the service to be consumed by any client',
       handler: LambdaOne,
       deploy: true,
-      proxy: true,
+      proxy: false,
       deployOptions:{
         stageName: 'dev'
         },
