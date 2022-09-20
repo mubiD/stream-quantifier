@@ -11,7 +11,8 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
   // the DynamoDB table that will hold:
   // table of users
   // each user will have:
-    // an accountName/userID (string)
+    // an accountName (string)
+    // userID (string)
     // activeStreamCount (number)
     // contentTitles (array)
 
@@ -24,7 +25,7 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
         name: 'accName',
         type: dynamoDB.AttributeType.STRING
       },
-      replicationRegions: ['us-east-1', 'us-east-2', 'us-west-2'],
+      replicationRegions: ['us-east-2', 'us-west-2'],
       removalPolicy: RemovalPolicy.DESTROY,
       readCapacity: 20,
       writeCapacity: 20,
@@ -32,16 +33,21 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
       billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
     })
 
-    // lambdas start here
+    // lambda start here
 
-    // this lambda will read from DynamoDB to check value of activeStreamCount
+    // this lambda will read from DynamoDB to:
+      // check value of activeStreamCount
+      // either allow or deny user request
+      // increment activeStreamCount by 1 on success
+      // append event.contentTitle to contentTitles array
     const LambdaOne = new lambda.Function(this, 'LambdaOne',{
       code: new lambda.AssetCode('resources'),
       handler: 'Lambdas.LambdaOneHandler',
       runtime: lambda.Runtime.NODEJS_16_X,
-      
-      // see lambda file for more info
-      
+      environment:{
+        TABLE_NAME: myTable.tableName,
+        PRIMARY_KEY: 'userID'
+      }      
     });
 
     // allowing lambda read and write access to dynamoDB table > myTable
@@ -50,13 +56,14 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
     // apigateway starts here
 
     // this API will expect two objects: (event, user)
-    // this API will have two methods: ( GET, PUT )
+    // this API will accept any method
     // it will pass the event, and user to lambda 
 
   const myApiGateway = new ApiGateway.LambdaRestApi(this, '/', {
       description: 'The api layer that exposes the service to be consumed by any client',
       handler: LambdaOne,
       deploy: true,
+      proxy: true,
       deployOptions:{
         stageName: 'dev'
         },
@@ -67,20 +74,21 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
           'Authorization',
           'X-Api-Key',
           ],
-          allowMethods: ['GET', 'PUT'],
+          allowMethods: ['ANY'],
           allowCredentials: true,
           allowOrigins: ['http://localhost:3000']
         }, 
-    })
-
-    myApiGateway.root.addMethod('GET');
-    myApiGateway.root.addMethod('PUT');
-
-
-    new cdk.CfnOutput(this, '/', {
-     value: myApiGateway.url
     });
-    
+
+    // adding the root directory 
+    const myApiGatewayRoot = myApiGateway.root.addResource('root');
+
+    // intergrating LambdaOne
+    const LambdaOneApi = new ApiGateway.LambdaIntegration(LambdaOne);
+
+    // adding method of 'ANY' to the root 
+    myApiGatewayRoot.addMethod('ANY', LambdaOneApi);
+
   }
 
 }
