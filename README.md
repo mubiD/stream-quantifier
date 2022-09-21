@@ -43,11 +43,10 @@ This is a service that will be called when a user starts, or stops, any content 
     - triggers, events and alerts can be linked up so that notifications relating to system heealth are delivered to admins
 
 #### To Do:
-1. Make ApiGateway pass params to Lambda
-2. Make Lambda expect params
-3. Make Lambda connect to and query DynamoDB
-4. Make Lambda validate the queried info on Table
-5. Make Lambda return response to ApiGateway
+1. Link apiGateway to Lambda
+2. Add automated testing
+3. Database seeding script
+4. Provision the namespace where the response from Lambda can be stored
 
 ### Here's how the service works:
 
@@ -67,9 +66,7 @@ This is a service that will be called when a user starts, or stops, any content 
         - event
         - user
     - pass params to lambda 
-    - await response from lambda
-
-##### Enhancement Strat:
+    - await response from lambda    
 
 #### Lambda:
 - This will hold the 'business' logic and will handle the computations
@@ -81,19 +78,13 @@ This is a service that will be called when a user starts, or stops, any content 
 - if the user is denied, lambda will return false to ApiGateway
 
 ##### To Do:
-    - expect params (event, user) from apigateway
-    - connect to dynamoDB and query the table based on the params passed 
-    - evaluate the info in the table 
-    - return an outcome response to apigateway
-
-##### Enhancement Strat:
+    - link to apigateway (incoming and response)
 
 #### Cloud watch:
 - This is used to monitor the health of the Lambda via the AWS management console dashboard
 
 ##### To Do:
-
-##### Enhancement Strat:
+- set up alerts and configure monitoring dashboard
 
 #### DynamoDB:
 - This will hold the tables containing users and user info. 
@@ -105,12 +96,13 @@ This is a service that will be called when a user starts, or stops, any content 
 - a DynamoDB Stream will be linked to the Lambda
 
 ##### To Do:
-
-##### Enhancement Strat:
-
+    
 #### Deployment Instructions:
-1. Ensure that you are in the root directory of the project
-2. Run the following command: 'cdk bootstrap --profile user1'.
-3. Once completed, run the following command: 'cdk deploy --profile user1'
+1. Ensure you are in the root directory of the project
+2. Run 'npm install'
+3. Navigate to bin/stream_quantifier_service.ts, and uncomment line 9.
+4. Insert yout AWS credentials {account number and region of deployment}
+5. Return to the root directory and run 'cdk bootstrap'
+6. Once done, run 'cdk deploy'
 
 

@@ -30,8 +30,7 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
       // readCapacity: 2,
       // writeCapacity: 2,
       // tableClass: dynamoDB.TableClass.STANDARD_INFREQUENT_ACCESS,
-      // billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
-    })
+    });
 
     // lambda start here
 
@@ -55,10 +54,6 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
     myTable.grantReadWriteData(LambdaOne);
 
     // apigateway starts here
-
-    // this API will expect two objects: (event, user)
-    // this API will allow any method
-    // it will pass the event, and user to lambda 
 
   const myApiGateway = new ApiGateway.LambdaRestApi(this, '/', {
       description: 'The api layer that exposes the service to be consumed by any client',
@@ -85,13 +80,16 @@ export class StreamQuantifierServiceStack extends cdk.Stack {
     const myApiGatewayRoot = myApiGateway.root.addResource('root');
 
     // intergrating LambdaOne
+    // will return the response to apiGateway
     const LambdaOneApi = new ApiGateway.LambdaIntegration(LambdaOne);
+    
 
     // adding method of 'ANY' to the root 
     myApiGatewayRoot.addMethod('ANY', LambdaOneApi);
 
   }
 
+  
 }
 
 

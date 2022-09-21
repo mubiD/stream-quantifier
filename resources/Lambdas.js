@@ -19,7 +19,7 @@ async function getUser(params){
 
     try{
         // seraching for user by user ID
-       const userFound = await DynamoDB.TABLE_NAME.get(params.user).promise();
+       const userFound = await db.TABLE_NAME.get(params.user).promise();
 
        return { body: JSON.stringify(userFound)}
 
@@ -66,6 +66,11 @@ export function LambdaOneHandler(userFound, contentReqs){
             headers: {"Context-Type": "text/plain"},
             body: 'You are not allowed more than three simultaneous streams ' 
         }
-
+    }else {
+        return{
+            statusCode: 400,
+            headers: {"Context-Type": "text/plain"},
+            body: 'could not locate user in the DB'
+        }
     }
 };
